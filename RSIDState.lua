@@ -52,18 +52,21 @@ end
 function OversoldInvalidate(period)
     -- if RSI goes below oversold then the state is invalidated
     if (core.crossesUnder(RSI.DATA, Oversold, period)) then
+        core.host:trace("RSIDState.OversoldInvalidate: " + RSI.DATA[period]);
         reset();
     end
 end
 function OverboughtInvalidate(period)
     -- if RSI goes above overbought then the state is invalidated
     if (core.crossesOver(RSI.DATA, Overbought, period)) then
+        core.host:trace("RSIDState.OverboughtInvalidate: " + RSI.DATA[period]);
         reset();
     end
 end
 function BearishDivergence()
     -- second peak price is higher but RSI is lower
     if (peakPrice1 < peakPrice2 and peakRSI1 > peakRSI2) then
+        core.host:trace("RSIDState.BearishDivergence: Prc1: " + peakPrice1 + ", Prc2: " + peakPrice2 + ", RSI1: " + peakRSI1 + ", RSI2: " + peakRSI2);
         return -1;
     end
     return 0;
@@ -71,9 +74,17 @@ end
 function BullishDivergence()
     -- second peak price is lower but RSI is higher
     if (peakPrice1 > peakPrice2 and peakRSI1 < peakRSI2) then
+        core.host:trace("RSIDState.BullishDivergence: Prc1: " + peakPrice1 + ", Prc2: " + peakPrice2 + ", RSI1: " + peakRSI1 + ", RSI2: " + peakRSI2);
         return 1;
     end
     return 0;
+end
+function LogState(period)
+    core.host:trace("RSIDState: " currentState + 
+        ", Prc1: " + peakPrice1 + ", Prc2: " + peakPrice2 + 
+        ", RSI1: " + peakRSI1 + ", RSI2: " + peakRSI2 + ", RSI: " + RSI.DATA[period] +        
+        ", BBhi: " + BBhi[period] + ", BBav: " + BBavg[period] + ", BBlo: " + BBlo[period]
+    );
 end
 
 function update(period)
@@ -83,6 +94,7 @@ function update(period)
         return result;
     end
     if (currentState == "None") then
+        LogState(period);
         -- RSI into overbought/oversold territory
         if (core.crossesOver(RSI.DATA, Overbought, period)) then
             -- into overbought
@@ -93,6 +105,7 @@ function update(period)
         end
         
     elseif (currentState == "FirstLongForming" ) then
+        LogState(period);
         -- during long, keep track the highest RSI and price
         if (src[period] > peakPrice1) then
             peakPrice1 = src[period];
@@ -107,6 +120,7 @@ function update(period)
         OversoldInvalidate(period);
 
     elseif (currentState == "FirstShortForming" ) then
+        LogState(period);
         -- during short, keep track the lowest RSI and price
         if (src[period] < peakPrice1 or peakPrice1 == -1) then
             peakPrice1 = src[period];
@@ -121,6 +135,7 @@ function update(period)
         OverboughtInvalidate(period);
         
     elseif (currentState == "FirstLongComplete" ) then
+        LogState(period);
         -- if the price makes a higher high then go to next state
         if (src[period] > peakPrice1) then
             currentState = "SecondLongForming";
@@ -128,6 +143,7 @@ function update(period)
         OversoldInvalidate(period);
 
     elseif (currentState == "FirstShortComplete" ) then
+        LogState(period);
         -- if the price makes a lower low then go to next state
         if (src[period] < peakPrice1) then
             currentState = "SecondShortForming";
@@ -135,6 +151,7 @@ function update(period)
         OverboughtInvalidate(period);
         
     elseif (currentState == "SecondLongForming" ) then
+        LogState(period);
         -- track the second highest price and RSI
         if (src[period] > peakPrice2) then
             peakPrice2 = src[period];
@@ -149,6 +166,7 @@ function update(period)
         OversoldInvalidate(period);
 
     elseif (currentState == "SecondShortForming" ) then
+        LogState(period);
         -- track the second lowest price and RSI
         if (src[period] < peakPrice2 or peakPrice2 == -1) then
             peakPrice2 = src[period];
@@ -163,6 +181,7 @@ function update(period)
         OverboughtInvalidate(period);
         
     elseif (currentState == "SecondLongComplete" ) then
+        LogState(period);
         result = BearishDivergence();
         -- hitting stop loss
         if (src[period] > peakPrice2) then
@@ -174,6 +193,7 @@ function update(period)
         end
 
     elseif (currentState == "SecondShortComplete" ) then
+        LogState(period);
         result = BullishDivergence();
         -- hitting stop loss
         if (src[period] < peakPrice2) then
