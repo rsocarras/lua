@@ -52,21 +52,21 @@ end
 function OversoldInvalidate(period)
     -- if RSI goes below oversold then the state is invalidated
     if (core.crossesUnder(RSI.DATA, Oversold, period)) then
-        core.host:trace("RSIDState.OversoldInvalidate: " + RSI.DATA[period]);
+        core.host:trace("RSIDState.OversoldInvalidate: " .. RSI.DATA[period]);
         reset();
     end
 end
 function OverboughtInvalidate(period)
     -- if RSI goes above overbought then the state is invalidated
     if (core.crossesOver(RSI.DATA, Overbought, period)) then
-        core.host:trace("RSIDState.OverboughtInvalidate: " + RSI.DATA[period]);
+        core.host:trace("RSIDState.OverboughtInvalidate: " .. RSI.DATA[period]);
         reset();
     end
 end
 function BearishDivergence()
     -- second peak price is higher but RSI is lower
     if (peakPrice1 < peakPrice2 and peakRSI1 > peakRSI2) then
-        core.host:trace("RSIDState.BearishDivergence: Prc1: " + peakPrice1 + ", Prc2: " + peakPrice2 + ", RSI1: " + peakRSI1 + ", RSI2: " + peakRSI2);
+        core.host:trace("RSIDState.BearishDivergence: Prc1: " .. peakPrice1 .. ", Prc2: " .. peakPrice2 .. ", RSI1: " .. peakRSI1 .. ", RSI2: " .. peakRSI2);
         return -1;
     end
     return 0;
@@ -74,16 +74,16 @@ end
 function BullishDivergence()
     -- second peak price is lower but RSI is higher
     if (peakPrice1 > peakPrice2 and peakRSI1 < peakRSI2) then
-        core.host:trace("RSIDState.BullishDivergence: Prc1: " + peakPrice1 + ", Prc2: " + peakPrice2 + ", RSI1: " + peakRSI1 + ", RSI2: " + peakRSI2);
+        core.host:trace("RSIDState.BullishDivergence: Prc1: " .. peakPrice1 .. ", Prc2: " .. peakPrice2 .. ", RSI1: " .. peakRSI1 .. ", RSI2: " .. peakRSI2);
         return 1;
     end
     return 0;
 end
 function LogState(period)
-    core.host:trace("RSIDState: " + currentState + 
-        ", Prc1: " + peakPrice1 + ", Prc2: " + peakPrice2 + 
-        ", RSI1: " + peakRSI1 + ", RSI2: " + peakRSI2 + ", RSI: " + RSI.DATA[period] +        
-        ", BBhi: " + BBhi[period] + ", BBav: " + BBavg[period] + ", BBlo: " + BBlo[period]
+    core.host:trace("RSIDState: " .. currentState ..
+        ", Prc1: " .. peakPrice1   .. ", Prc2: " .. peakPrice2    ..
+        ", RSI1: " .. peakRSI1     .. ", RSI2: " .. peakRSI2      .. ", RSI: "  .. RSI.DATA[period] ..
+        ", BBhi: " .. BBhi[period] .. ", BBav: " .. BBavg[period] .. ", BBlo: " .. BBlo[period]
     );
 end
 
