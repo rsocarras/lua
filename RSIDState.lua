@@ -80,7 +80,7 @@ function BullishDivergence()
     return 0;
 end
 function LogState(period)
-    core.host:trace("RSIDState: " currentState + 
+    core.host:trace("RSIDState: " + currentState + 
         ", Prc1: " + peakPrice1 + ", Prc2: " + peakPrice2 + 
         ", RSI1: " + peakRSI1 + ", RSI2: " + peakRSI2 + ", RSI: " + RSI.DATA[period] +        
         ", BBhi: " + BBhi[period] + ", BBav: " + BBavg[period] + ", BBlo: " + BBlo[period]
