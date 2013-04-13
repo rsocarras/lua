@@ -51,7 +51,7 @@ local TrailingStop = nil;
 local CanClose = nil;
 local AllowDirection;
 
-function prepare(instance)
+function prepare(instance, name)
     ShowAlert = instance.parameters.ShowAlert;
     AllowDirection = instance.parameters.AllowDirection;
     local PlaySound = instance.parameters.PlaySound
@@ -70,11 +70,6 @@ function prepare(instance)
         Email = nil;
     end
     assert(not(SendEmail) or Email ~= "", "Email address must be specified");
-    assert(instance.parameters.TF ~= "t1", "The time frame must not be tick");
-
-    local name;
-    name = profile:id() .. "(" .. instance.bid:name() .. "." .. instance.parameters.TF .. "," .. ")";
-    instance:name(name);
 
     AllowTrade = instance.parameters.AllowTrade;
     if AllowTrade then
@@ -95,23 +90,14 @@ function prepare(instance)
     ExtSetupSignalMail(name);
 end
 
--- b1OrS2 - 1 to set MustOpenB to true, 2 to set MustOpenS to true
-function update(b1OrS2)
+
+function update(source, period, MustOpenB, MustOpenS)
 
     local pipSize = instance.bid:pipSize()
 
     local trades = core.host:findTable("trades");
     local haveTrades = (trades:find('AccountID', Account) ~= nil)
 
-    local MustOpenB=false;
-    local MustOpenS=false;
-
-    if (b1OrS2 == 1) then
-        MustOpenB=true;
-    else
-        MustOpenS=true;
-    end
-    
     if (haveTrades) then
         local enum = trades:enumerator();
         while true do
