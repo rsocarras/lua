@@ -17,9 +17,9 @@ function init(strategy) --Order related parameters
 
     strategy.parameters:addGroup("Risk Parameters");
     strategy.parameters:addInteger("Risk", "Risk Percent", "", 2, 1, 100);
-    strategy.parameters:addBoolean("SetLimit", "Set Limit Orders", "", true);
+    strategy.parameters:addBoolean("SetLimit", "Set Limit Orders", "", false);
     strategy.parameters:addInteger("LimitMultiples", "Limit Order multiples of ATR", "", 2, 1, 100);
-    strategy.parameters:addBoolean("SetStop", "Set Stop Orders", "", true);
+    strategy.parameters:addBoolean("SetStop", "Set Stop Orders", "", false);
     strategy.parameters:addInteger("StopMultiples", "Stop Order multiples of ATR", "", 2, 1, 100);
     strategy.parameters:addBoolean("TrailingStop", "Trailing stop order", "", false);
 
@@ -256,7 +256,7 @@ function Open(side, aLotSize)
 		valuemap.EntryLimitStop = 'Y';
 	end
 
-    core.host:trace("Side: " .. valuemap.BuySell .. ", Now: " .. instance.bid[NOW] .. ", Limit: " .. valuemap.RateLimit .. ", Stop: " .. valuemap.RateStop);
+    core.host:trace("Side: " .. valuemap.BuySell .. ", Now: " .. instance.bid[NOW] .. ", Limit: " .. tostring(valuemap.RateLimit) .. ", Stop: " .. tostring(valuemap.RateStop));
     success, msg = terminal:execute(100, valuemap);
 
 	if not(success) then
