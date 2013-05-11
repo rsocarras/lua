@@ -113,7 +113,7 @@ function update(period)
             peakRSI1 = RSI.DATA[period];
         end
         -- if price crosses below the average line then first peak is comleted
-        if (src.low[period] < BBavg[period]) then
+        if (peakPrice1 > 0 and peakRSI1 > 0 and src.low[period] <= BBavg[period]) then
             setState("FirstLongComplete");
         end
         OversoldInvalidate(period);
@@ -127,7 +127,7 @@ function update(period)
             peakRSI1 = RSI.DATA[period];
         end
         -- if price crosses above the average line then first peak is comleted
-        if (src.high[period] > BBavg[period]) then
+        if (peakPrice1 > 0 and peakRSI1 > 0 and src.high[period] >= BBavg[period]) then
             setState("FirstShortComplete");
         end
         OverboughtInvalidate(period);
@@ -157,7 +157,7 @@ function update(period)
             peakRSI2 = RSI.DATA[period];
         end
         -- if price crosses below the average line then second peak is completed
-        if (src.low[period] < BBavg[period]) then
+        if (peakPrice2 > 0 and peakRSI2 > 0 and src.low[period] < peakPrice1) then
             setState("SecondLongComplete");
         end
         OversoldInvalidate(period);
@@ -171,7 +171,7 @@ function update(period)
             peakRSI2 = RSI.DATA[period];
         end
         -- if price crosses above the average line then second peak is completed
-        if (src.high[period] > BBavg[period]) then
+        if (peakPrice2 > 0 and peakRSI2 > 0 and src.high[period] > peakPrice1) then
             setState("SecondShortComplete");
         end
         OverboughtInvalidate(period);
@@ -179,7 +179,7 @@ function update(period)
     elseif (currentState == "SecondLongComplete" ) then
         result = BearishDivergence();
         -- hitting stop loss
-        if (src.close[period] > peakPrice2) then
+        if (src.high[period] > peakPrice2) then
             reset();
         end
         -- hitting limit
@@ -190,7 +190,7 @@ function update(period)
     elseif (currentState == "SecondShortComplete" ) then
         result = BullishDivergence();
         -- hitting stop loss
-        if (src.close[period] < peakPrice2) then
+        if (src.low[period] < peakPrice2) then
             reset();
         end
         -- hitting limit
