@@ -93,10 +93,10 @@ end
 
 function update(source, period, MustOpenB, MustOpenS)
 
-    local pipSize = instance.bid:pipSize()
+    local pipSize = instance.bid:pipSize() -- Tamaño del PIP
 
-    local trades = core.host:findTable("trades");
-    local haveTrades = (trades:find('AccountID', Account) ~= nil)
+    local trades = core.host:findTable("trades"); -- Cuantas operaciones tiene Abierta 
+    local haveTrades = (trades:find('AccountID', Account) ~= nil) -- si tiene una operaciones abierta null
 
     if (haveTrades) then
         local enum = trades:enumerator();
@@ -118,8 +118,8 @@ function update(source, period, MustOpenB, MustOpenS)
 						if AllowTrade then
 							Close(row);
 							if instance.parameters.AllowDirection~="Long" then
---								core.host:trace(GetTimeString(source:date(period)) .. " Sending signal to Open SELL" );
-								Open("S", Amount)
+								core.host:trace(GetTimeString(source:date(period)) .. " Sending signal to Open SELL" );
+--								Open("S", Amount)
 							end
 						end
 					end
@@ -136,8 +136,8 @@ function update(source, period, MustOpenB, MustOpenS)
 						if AllowTrade then
 							Close(row);
 							if instance.parameters.AllowDirection~="Short" then
---								core.host:trace(GetTimeString(source:date(period)) .. " Sending signal to Open BUY" );
-								Open("B", Amount)
+								core.host:trace(GetTimeString(source:date(period)) .. " Sending signal to Open BUY" );
+--								Open("B", Amount)
 							end
 						end
 					end
@@ -150,8 +150,8 @@ function update(source, period, MustOpenB, MustOpenS)
 				ExtSignal(source, period, "BUY", SoundFile, Email, RecurrentSound)
 			end
 			if AllowTrade then
---				core.host:trace(GetTimeString(source:date(period)) .. " No Trades present, sending signal to Open a BUY Trade! ");
-				Open("B", Amount)
+				core.host:trace(GetTimeString(source:date(period)) .. " No Trades present, sending signal to Open a BUY Trade! ");
+--				Open("B", Amount)
 			end
 		end
 		if MustOpenS==true and instance.parameters.AllowDirection~="Long" then
@@ -159,8 +159,8 @@ function update(source, period, MustOpenB, MustOpenS)
             	ExtSignal(source, period, "SELL", SoundFile, Email, RecurrentSound)
 			end
             if AllowTrade then
---				core.host:trace(GetTimeString(source:date(period)) .. " No Trades present, sending signal to Open a SELL Trade! ");
-                Open("S", Amount)
+    			core.host:trace(GetTimeString(source:date(period)) .. " No Trades present, sending signal to Open a SELL Trade! ");
+--                Open("S", Amount)
 			end
         end
     end
@@ -206,9 +206,10 @@ function Open(side, aLotSize)
 	valuemap.PegTypeStop = "M";
 	valuemap.CustomID = "Programming Services" .. " " .. profile:id() .. " " .. instance.parameters.MagicNumber;
 	valuemap.BuySell = side;
-	if SetLimit then
+
+	if SetLimit then -- Esto es lo que queremos ganar, Take Profit
 		if side == "B" then
-			valuemap.RateLimit = instance.ask[NOW] + (Limit * instance.bid:pipSize());
+			valuemap.RateLimit = instance.ask[NOW] + (Limit * instance.bid:pipSize()); -- Multiplicar el limite por el 0.0001 o 0.00001
 		else
 			valuemap.RateLimit = instance.bid[NOW] - (Limit * instance.bid:pipSize());
 		end
@@ -222,7 +223,7 @@ function Open(side, aLotSize)
 		end
 	end
 
-	if TrailingStop then
+	if TrailingStop then 
 		valuemap.TrailStepStop = 1;
 	end
 
